@@ -28,12 +28,21 @@ class HTTPServer:
     def __init__(self):
         self.address = ADDR
         self.create_socket()
+        self.connect_socket()
         self.bind()
 
     # 创建tcp套接字
     def create_socket(self):
         self.sockfd = socket()
         self.sockfd.setsockopt(SOL_SOCKET, SO_REUSEADDR, DEBUG)
+
+    # 创建与WebFrame交互的套接字
+    def connect_socket(self):
+        self.connect_socket = socket()
+        try:
+            self.connect_socket.connect((FRAME_IP, FRAME_PORT))
+        except Exception as e:
+            sys.exit(e)
 
     # 绑定地址
     def bind(self):
@@ -71,7 +80,9 @@ class HTTPServer:
             connfd.close()
             return
         else:
-            print(result)
+            # 将字典转换为JSON
+            data = json.dumps(result)
+            self.connect_socket.send(data.encode())
 
 
 httpd = HTTPServer()
