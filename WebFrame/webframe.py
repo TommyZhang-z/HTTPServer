@@ -6,7 +6,6 @@ from socket import *
 from select import select
 import json
 from settings import *
-from httpserver.jsontest import *
 
 
 # 应用类，处理某一方面的请求

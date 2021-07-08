@@ -17,7 +17,6 @@ from threading import Thread
 from config import *
 import re
 import json
-from jsontest import *
 
 
 # 服务器地址
