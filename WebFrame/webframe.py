@@ -27,11 +27,13 @@ class Application:
         while True:
             rs, ws, xs = select(self.rlist, self.wlist, self.xlist)
             self.receive(rs)
+            self.responding(ws)
 
-            for w in ws:
-                w.send(json.dumps(self.msg[w]).encode())
-                del self.msg[w]
-                self.wlist.remove(w)
+    def responding(self, ws):
+        for w in ws:
+            w.send(json.dumps(self.msg[w]).encode())
+            del self.msg[w]
+            self.wlist.remove(w)
 
     def receive(self, rs):
         for r in rs:
@@ -44,9 +46,17 @@ class Application:
 
     def handle(self, connfd):
         data = connfd.recv(1024).decode()
-        print(json.loads(data))
-        self.msg[connfd] = {'status': '200', 'data': '<h1>HTTPServer 3.0 Arrived!</h1>'}
+        data = json.loads(data)
+        if data['method'] == 'GET':
+            if data['info'] == '/' or data['info'][-5:] == '.html':
+                response = self.get_html(data['info'])
+        elif data['method'] == 'POST':
+            pass
+        self.msg[connfd] = response
         self.wlist.append(connfd)
+
+    def get_html(self, param) -> dict:
+        pass
 
 
 app = Application()
