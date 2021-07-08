@@ -5,5 +5,5 @@ cookie
     # python json 模块
     import json
 
-    json.dump(dict) ->  json    将字典转换为json
-    json.dump(json) ->  dict    将json转换为字典
+    json.dumps(dict) ->  json    将字典转换为json
+    json.loads(json) ->  dict    将json转换为字典

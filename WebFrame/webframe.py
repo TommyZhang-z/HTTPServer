@@ -6,6 +6,7 @@ from socket import *
 from select import select
 import json
 from settings import *
+from httpserver.jsontest import *
 
 
 # 应用类，处理某一方面的请求
@@ -31,7 +32,7 @@ class Application:
 
     def responding(self, ws):
         for w in ws:
-            w.send(json.dumps(self.msg[w]).encode())
+            w.send((self.msg[w]).encode())
             del self.msg[w]
             self.wlist.remove(w)
 
@@ -45,19 +46,35 @@ class Application:
                 self.rlist.remove(r)
 
     def handle(self, connfd):
+        response = {}
         data = connfd.recv(1024).decode()
         data = json.loads(data)
+        print(data)
         if data['method'] == 'GET':
             if data['info'] == '/' or data['info'][-5:] == '.html':
+                print("assign")
                 response = self.get_html(data['info'])
+            else:
+                response = {'status':'200', 'data': "xxxx"}
         elif data['method'] == 'POST':
             pass
-        self.msg[connfd] = response
+        self.msg[connfd] = json.dumps(response)
         self.wlist.append(connfd)
 
-    def get_html(self, param) -> dict:
-        pass
-
+    def get_html(self, info) -> dict:
+        if info == "/":
+            filename = Directory + "/index.html"
+        else:
+            filename = Directory + info
+        try:
+            fd = open(filename, 'r', encoding='utf-8')
+        except:
+            fd = open(Directory + '/error.html', 'r', encoding='utf-8')
+            result = {"status": "404", 'data': fd.read()}
+        else:
+            result = {"status": "200", 'data': fd.read()}
+        finally:
+            return result
 
 app = Application()
 app.start()

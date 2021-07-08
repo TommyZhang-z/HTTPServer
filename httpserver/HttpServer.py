@@ -17,6 +17,7 @@ from threading import Thread
 from config import *
 import re
 import json
+from jsontest import *
 
 
 # 服务器地址
@@ -24,7 +25,7 @@ ADDR = (HOST, PORT)
 
 
 # 创建与WebFrame交互的套接字
-def connect_frame(result) -> None or str:
+def connect_to_frame(result):
     WebFrame_socket = socket()
     try:
         WebFrame_socket.connect((FRAME_IP, FRAME_PORT))
@@ -33,7 +34,7 @@ def connect_frame(result) -> None or str:
         return
     data = json.dumps(result)
     WebFrame_socket.send(data.encode())
-    response = WebFrame_socket.recv(1024 * 1024).decode()
+    response = WebFrame_socket.recv(4096 * 100)
     return json.loads(response)
 
 
@@ -43,7 +44,7 @@ class HTTPServer:
     # 响应头
     responseSTATUS = {
         '200': "HTTP/1.1 200 OK\r\n",
-        '400': "HTTP/1.1 404 Not Found\r\n"
+        '404': "HTTP/1.1 404 Not Found\r\n"
     }
 
     def __init__(self):
@@ -93,13 +94,15 @@ class HTTPServer:
             connfd.close()
             return
         else:
-            # 将字典转换为JSON
-            data = connect_frame(result)
+            data = connect_to_frame(result)
+            print(data)
             self.response(connfd, data)
 
     # 从WebFrame接收数据并转发给客户端
     def response(self, connfd, data):
+        print(data)
         responseHeaders = self.responseSTATUS[data['status']]
+        # responseHeaders = self.responseSTATUS['200']
         responseHeaders += "Content-Type:text/html\r\n"
         responseHeaders += "\r\n"
         responseBody = data['data']
