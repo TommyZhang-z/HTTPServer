@@ -25,7 +25,7 @@ ADDR = (HOST, PORT)
 
 
 # 创建与WebFrame交互的套接字
-def connect_to_frame(result):
+def connect_to_frame(result) -> dict or None:
     WebFrame_socket = socket()
     try:
         WebFrame_socket.connect((FRAME_IP, FRAME_PORT))

@@ -76,6 +76,7 @@ class Application:
         finally:
             return result
 
+
 app = Application()
 app.start()
 
