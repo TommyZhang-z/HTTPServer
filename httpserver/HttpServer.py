@@ -94,14 +94,13 @@ class HTTPServer:
             return
         else:
             data = connect_to_frame(result)
-            print(data)
-            self.response(connfd, data)
+            if data:
+                self.response(connfd, data)
 
     # 从WebFrame接收数据并转发给客户端
     def response(self, connfd, data):
         print(data)
         responseHeaders = self.responseSTATUS[data['status']]
-        # responseHeaders = self.responseSTATUS['200']
         responseHeaders += "Content-Type:text/html\r\n"
         responseHeaders += "\r\n"
         responseBody = data['data']

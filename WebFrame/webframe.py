@@ -6,6 +6,7 @@ from socket import *
 from select import select
 import json
 from settings import *
+from urls import *
 
 
 # 应用类，处理某一方面的请求
@@ -45,16 +46,14 @@ class Application:
                 self.rlist.remove(r)
 
     def handle(self, connfd):
-        response = {}
         data = connfd.recv(1024).decode()
         data = json.loads(data)
         print(data)
         if data['method'] == 'GET':
             if data['info'] == '/' or data['info'][-5:] == '.html':
-                print("assign")
                 response = self.get_html(data['info'])
             else:
-                response = {'status':'200', 'data': "xxxx"}
+                response = self.get_data(data['info'])
         elif data['method'] == 'POST':
             pass
         self.msg[connfd] = json.dumps(response)
@@ -68,23 +67,24 @@ class Application:
         try:
             fd = open(filename, 'r', encoding='utf-8')
         except:
-            fd = open(Directory + '/error.html', 'r', encoding='utf-8')
-            result = {"status": "404", 'data': fd.read()}
+            fd = open(Directory + '/404.html', 'r', encoding='utf-8')
+            return {"status": "404", 'data': fd.read()}
         else:
-            result = {"status": "200", 'data': fd.read()}
-        finally:
-            return result
+            return {"status": "200", 'data': fd.read()}
+
+    def get_data(self, info):
+        # 规定格式
+        for url, func in urls:
+            if url == info:
+                return {'status': '200', 'data': func()}
+        return {'status': '404', 'data': 'Sorry...'}
+
+        # 我自己的处理方法
+        # if info in urls:
+        #     return {'status': '200', 'data': urls[info]()}
+        # else:
+        #     return {'status': '200', 'data': 'Sorry...'}
 
 
 app = Application()
 app.start()
-
-
-
-
-
-
-
-
-
-
