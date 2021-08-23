@@ -79,7 +79,7 @@ class HTTPServer:
 
             # 接收到客户端连接 开始线程
             ClientThread = Thread(target=self.handle, args=(connfd,))
-            ClientThread.setDaemon(True)
+            ClientThread.setDaemon = True
             ClientThread.start()
 
     # 处理HTTP访问
